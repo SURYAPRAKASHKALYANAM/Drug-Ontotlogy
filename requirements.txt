@@ -1,2 +1,5 @@
 streamlit
-openai
+langchain
+langchain-community
+langchain-groq 
+neo4j
