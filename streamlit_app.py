@@ -21,7 +21,7 @@ graph=Neo4jGraph(
 
 llm=ChatGroq(groq_api_key=groq_api_key,model_name="llama3-groq-70b-8192-tool-use-preview")
 
-chain=GraphCypherQAChain.from_llm(llm=llm,graph=graph,verbose=True,allow_dangerous_requests=True)
+chain=GraphCypherQAChain.from_llm(llm=llm,graph=graph,verbose=True,allow_dangerous_requests=True,return_intermediate_steps=True)
 
 def response_generator(response):
     for word in response.split():
@@ -43,6 +43,11 @@ if prompt := st.chat_input("Ask something"):
         st.markdown(prompt)
     with st.chat_message("assistant"):
         output = chain.invoke({"query": prompt})
+        st.subheader("Generated Cypher:")
+        st.code(str(output["intermediate_steps"][0]["query"]))
+        st.subheader("Context from Neo4j")
+        st.code(str(output["intermediate_steps"][1]["context"][0]))
+        st.subheader("llm Response")
         response = st.write_stream(response_generator(output["result"]))
     # Add assistant response to chat history
     st.session_state.messages.append({"role": "assistant", "content": response})
